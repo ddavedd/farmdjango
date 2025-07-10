@@ -16,15 +16,16 @@ class Command(BaseCommand):
       if options['report_type']:
          if options['report_type'] == 'daily':
             print("Generate daily report only")
-            generate_day(None, "westchester", True)
+            for l in get_locations():
+                generate_day(None, l, True)
          elif options['report_type'] == 'total':
             print("Generating total report")
-            generate(2024)
+            generate(2025)
             print("Done")
          elif options['report_type'] == 'detail':
             yearly_comparison()
             yearly_comparison(7)
-            product_detail(2024)
+            product_detail(2025)
             ### PRODUCT DETAIL BY MONTH ###
             #for month in [4,5,6,7,8,9,10,11,]:
                #product_detail(2024, month = month)
@@ -89,12 +90,12 @@ def yearly_comparison(delta=1):
    #third_year_date = datetime.datetime(2020, 1, 13, 0, 0, 0)
    #fourth_year_date = datetime.datetime(2021, 1, 11, 0, 0, 0)
    #fifth_year_date = datetime.datetime(2022,1,10,0,0,0)
-   sixth_year_date = datetime.datetime(2023,1,9,0,0,0)
-   seventh_year_date = datetime.datetime(2024,1,8,0,0,0)
-   
+   #sixth_year_date = datetime.datetime(2023,1,9,0,0,0)
+   #seventh_year_date = datetime.datetime(2024,1,8,0,0,0)
+   seventh_year_date = datetime.datetime(2025,1,6,0,0,0)
    day_delta = datetime.timedelta(days=delta)
    
-   year_dates = [sixth_year_date, seventh_year_date]
+   year_dates = [ seventh_year_date]
    #year_dates = [fourth_year_date, fifth_year_date, sixth_year_date]
    totals = []
    trans_counts = []
@@ -167,8 +168,8 @@ def yearly_comparison(delta=1):
          
          for i in range(len(totals)):
             table_day.append(int(totals[i]))
-         
-         table_day.append(colorize_number(totals[-1]-totals[-2]))
+         if len(totals) >= 2:
+            table_day.append(colorize_number(totals[-1]-totals[-2]))
          
          sales_table.append(table_day)
          
