@@ -1,1 +1,2 @@
 sed -i "s/USERNAME/${USER}/g" *.sh
+sed -i "s/USERNAME/${USER}/g" report_schedule.cron
