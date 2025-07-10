@@ -107,6 +107,7 @@ class TransactionTotal(models.Model):
    transaction_time = models.IntegerField()
    location = models.CharField(max_length=100, default="stand")
    transaction_type = models.CharField(max_length=100, default="Unknown")
+   register = models.CharField(max_length=100, default="register_unknown")
    
    def __str__(self):
       return "Total: %.2f Subtotal %.2f Ed Tax %.2f Noned Tax %.2f %s" % \

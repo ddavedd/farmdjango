@@ -255,7 +255,10 @@ def total_money_count(year, location=None):
    else:
       total_money = TransactionTotal.objects.filter(timestamp__year=year).filter(location=location).aggregate(Sum('total'))
       print("Generating money count for location " + location)
-   return total_money["total__sum"]   
+   total_money_count = total_money["total__sum"]
+   if total_money_count is None:
+      total_money_count = 0.0
+   return total_money_count
    
 def by_day_transaction_type(transaction_date, location=None):
    print("Transactions by payment type, location data not used")
@@ -365,8 +368,11 @@ def get_deal_name(deal_id):
 
 def yearly_product_count(year):
    print("Year currently not working")
-   first_trans_of_year = TransactionTotal.objects.filter(timestamp__year=year)[0].id
-   
+   first_trans_of_year = TransactionTotal.objects.filter(timestamp__year=year)
+   if len(first_trans_of_year) == 0:
+      return []
+   else:
+      first_trans_of_year = first_trans_of_year[0].id
    print("Yearly product count")
    product_counts = []
    totals = TransactionItem.objects.filter(transaction_id__gt=first_trans_of_year).filter(is_product=1).values('product_or_deal_id').annotate(total=Sum('amount'))
@@ -381,7 +387,11 @@ def yearly_product_count(year):
 def yearly_department_money_count(year):
    print("Year currently not working")
    print("Yearly Department money count")
-   first_trans_of_year = TransactionTotal.objects.filter(timestamp__year=year)[0].id
+   first_trans_of_year = TransactionTotal.objects.filter(timestamp__year=year)
+   if len(first_trans_of_year) == 0:
+      return []
+   else:
+      first_trans_of_year = first_trans_of_year[0].id
    categories = Category.objects.all()
    counts = []
    for cat in categories:
@@ -421,18 +431,26 @@ def generate_location(location, year):
    location_html += "<a href='dates/" + location + "today.html'>Today</a>"
    print("Tally total sum")
    tot = TransactionTotal.objects.filter(timestamp__year=year).filter(location=location).aggregate(Sum('total'))['total__sum']
+   if tot is None:
+      tot = 0.0
    totals = [["Total"] + ["%.2f" % tot]]
 
    print("Tally subtotal sum")
    sub = TransactionTotal.objects.filter(timestamp__year=year).filter(location=location).aggregate(Sum('subtotal'))["subtotal__sum"]
+   if sub is None:
+      sub = 0.0
    totals += [["Subtotal"] + ["%.2f" % sub]]
 
    print("Tally Tax Edible sum")
    tax_ed = TransactionTotal.objects.filter(timestamp__year=year).filter(location=location).aggregate(Sum('edible_tax'))["edible_tax__sum"]
+   if tax_ed is None:
+      tax_ed = 0.0
    totals += [["Tax Edible"] + ["%.2f" % tax_ed]]
 
    print("Tally Tax Nonedible sum")
    tax_noned = TransactionTotal.objects.filter(timestamp__year=year).filter(location=location).aggregate(Sum('nonedible_tax'))["nonedible_tax__sum"]
+   if tax_noned is None:
+      tax_noned = 0.0
    totals += [["Tax Nonedible"] + ["%.2f" % tax_noned]]
    
    print("Totals for location tallied")
@@ -522,10 +540,16 @@ def generate(year):
    index_html += "<a href='year_comparison7.html'>Weekly Comparison</a>\n"
    totals = [["Total"] + ["%.2f" % total_money_count(year)]]
    sub = TransactionTotal.objects.filter(timestamp__year=year).aggregate(Sum('subtotal'))["subtotal__sum"]
+   if sub is None:
+      sub = 0.0
    totals += [["Subtotal"] + ["%.2f" % sub]]
    tax_ed = TransactionTotal.objects.filter(timestamp__year=year).aggregate(Sum('edible_tax'))["edible_tax__sum"]
+   if tax_ed is None:
+      tax_ed = 0.0
    totals += [["Tax Edible"] + ["%.2f" % tax_ed]] 
    tax_noned = TransactionTotal.objects.filter(timestamp__year=year).aggregate(Sum('nonedible_tax'))["nonedible_tax__sum"]
+   if tax_noned is None:
+      tax_noned = 0.0
    totals += [["Tax Nonedible"] + ["%.2f" % tax_noned]]
    
    yearly_dept = [["Department", "$"]] + yearly_department_money_count(year) 
